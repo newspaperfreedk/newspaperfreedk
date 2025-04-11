@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Latest News - News Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="mb-4">Latest News</h2>
+            <div class="row">
+                {% for item in news %}
+                <div class="col-md-6 mb-4">
+                    <div class="card news-card h-100">
+                        {% if item.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.image) }}" class="card-img-top" alt="{{ item.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="category-badge">{{ item.category }}</span>
+                            <h5 class="card-title">{{ item.title }}</h5>
+                            <p class="card-text">{{ item.content[:200] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">By {{ item.author }}</small>
+                                <small class="text-muted">{{ item.date_posted.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <a href="{{ url_for('news_detail', news_id=item.id) }}" class="btn btn-primary mt-3">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for category in categories %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('category_news', category=category[0]) }}" class="text-decoration-none">{{ category[0] }}</a>
+                            <span class="badge bg-primary rounded-pill">{{ news|selectattr('category', 'equalto', category[0])|list|length }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Popular News</h5>
+                </div>
+                <div class="card-body">
+                    {% set popular_news = news|sort(attribute='views', reverse=true) %}
+                    {% for item in popular_news[:3] %}
+                    <div class="mb-3">
+                        <h6><a href="{{ url_for('news_detail', news_id=item.id) }}" class="text-decoration-none">{{ item.title }}</a></h6>
+                        <small class="text-muted">{{ item.views }} views</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
